@@ -7,55 +7,114 @@
   {
     "inputs": [
       {
-        "internalType": "int256",
-        "name": "_value",
-        "type": "int256"
+        "internalType": "uint256",
+        "name": "_categorie",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
       }
     ],
-    "name": "addAnswer",
-    "outputs": [],
+    "name": "addQuestionnaire",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getAnswerChoices",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "string",
-        "name": "",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "",
+        "name": "_name",
         "type": "string"
       }
     ],
-    "stateMutability": "view",
+    "name": "createCategorie",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "nbResponse",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_categorie",
         "type": "uint256"
       }
     ],
+    "name": "getCategorieData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "deleted",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "questionnaires",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Vote.reacCategories",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "getCategorieIndexByName",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "question",
+    "name": "getCountCategorie",
     "outputs": [
       {
-        "internalType": "string",
-        "name": "questionToAsk",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "count",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -65,20 +124,85 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_categorie",
         "type": "uint256"
       }
     ],
-    "name": "responses",
+    "name": "getCountQuestionnaire",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "author",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "count",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_categorie",
+        "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "_questionnaire",
+        "type": "uint256"
+      }
+    ],
+    "name": "getQuestionnaireData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "indexCategorie",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "questions",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Vote.reacQuestionnaire",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_categorie",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "getQuestionnaireIndexByName",
+    "outputs": [
+      {
         "internalType": "int256",
-        "name": "choice",
+        "name": "",
         "type": "int256"
       }
     ],

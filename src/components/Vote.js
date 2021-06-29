@@ -3,7 +3,7 @@ import Web3 from "web3";
 import jsonInterface from "./jsonInterface.json";
 import StringUtils from "../utils/StringUtils";
 
-const addressContract = "0xbe1dC92Fe08BBFAE31E2362bF2c66EdcEE2E2196";
+const addressContract = "0x2AEf0329f6d9ce5d4a8fBb94280056B1A169a574";
 
 class Vote extends Component {
 
@@ -29,12 +29,18 @@ class Vote extends Component {
                 web3: false,
                 web3Account: null,
             },
-            question: null,
-            answerChoices: [],
-            transactionHash: null,
+
+            countCategorie: 0,
+            categories: [],
         };
 
         this.ethereum = window.ethereum;
+    }
+
+    setStateCountCategorie = (count) => {
+        const state = {...this.state};
+        state.countCategorie = count;
+        this.setState(state);
     }
 
     /**
@@ -64,7 +70,11 @@ class Vote extends Component {
 
         // Sauvegarde dans une variable local du composant React
         this.contract = myContract;
-        this.initQuestion();
+        this.initCategories();
+    }
+
+    initCategories = () => {
+        this.getCountCategorie();
     }
 
     /**
@@ -96,44 +106,18 @@ class Vote extends Component {
         });
     }
 
-    /**
-     * Intéroge le contract pour récupérer la question
-     * @returns {Promise<void>}
-     */
-    getQuestion = async () => {
+    getCategorieData = (index) => {
 
         // Si Web3 est connecté
         const {web3Account} = this.state.isConnected;
         if (web3Account.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.question().call({from: web3Account[0]}).then((result) => {
-
-                // Enregistre la question dans l'état du composant react
-                this.setQuestionState(result);
-
-            }).catch((error) => {
-                console.error(error);
-            });
-        }
-    }
-
-
-    /**
-     * Intéroge le contract pour récupérer les réponses possible
-     * @returns {Promise<void>}
-     */
-    getAnswerChoices = async () => {
-
-        // Si Web3 est connecté
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
-
-            // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.getAnswerChoices().call({from: web3Account[0]}).then((result) => {
+            this.contract.methods.getCategorieData(index).call({from: web3Account[0]}).then((result) => {
 
                 console.log(result);
-                this.setAnswerChoicesState([result[0], result[1]]);
+                const {index, name} = result;
+                this.addCategorieInState(name);
 
             }).catch((error) => {
                 console.error(error);
@@ -141,35 +125,53 @@ class Vote extends Component {
         }
     }
 
-    setStateTransactionHash = (transactionHash) => {
+    resetCategories = () => {
         const state = {...this.state};
-        state.transactionHash = transactionHash;
+        state.categories = [];
         this.setState(state);
     }
 
-    addAnswer = async (choice) => {
+    getCountCategorie = () => {
+
+        this.resetCategories();
 
         // Si Web3 est connecté
         const {web3Account} = this.state.isConnected;
         if (web3Account.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.addAnswer(choice).send({from: web3Account[0]}).then((result) => {
+            this.contract.methods.getCountCategorie().call({from: web3Account[0]}).then((result) => {
 
                 console.log(result);
-                const {
-                    blockHash,
-                    blockNumber,
-                    contractAddress,
-                    cumulativeGasUsed,
-                    from,
-                    gasUsd,
-                    status,
-                    to,
-                    transactionHash
-                } = result;
+                this.setStateCountCategorie(result);
 
-                this.setStateTransactionHash(transactionHash);
+                for (let i = 0; i < result; i++) {
+                    this.getCategorieData(i);
+                }
+
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }
+
+    addCategorieInState = (categorie) => {
+        const state = {...this.state};
+        state.categories.push(categorie);
+        this.setState(state);
+    }
+
+    getCategorieIndexByName = (name) => {
+
+        // Si Web3 est connecté
+        const {web3Account} = this.state.isConnected;
+        if (web3Account.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            this.contract.methods.getCategorieIndexByName(name).call({from: web3Account[0]}).then((result) => {
+
+                console.log(result);
+                this.addCategorieInState(result);
 
             }).catch((error) => {
                 console.error(error);
@@ -178,32 +180,28 @@ class Vote extends Component {
     }
 
 
-    /**
-     * Enregistre le changement de question dans l'état du composant React
-     * @param question
-     */
-    setQuestionState = (question) => {
-        const state = {...this.state};
-        state.question = question;
-        this.setState(state);
+    createCategorie = (name) => {
+
+        // Si Web3 est connecté
+        const {web3Account} = this.state.isConnected;
+        if (web3Account.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            this.contract.methods.createCategorie(name).send({from: web3Account[0]}).then((result) => {
+
+                console.log(result);
+                this.initCategories();
+
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
     }
 
-    /**
-     * Enregistre le changement des réponses proposées dans l'état du composant React
-     * @param responses
-     */
-    setAnswerChoicesState = (responses) => {
-        const state = {...this.state};
-        state.answerChoices = responses;
-        this.setState(state);
-    }
-
-    /**
-     * Exécuter les requetes de lecture du Contract Solidity
-     */
-    initQuestion = () => {
-        this.getQuestion();
-        this.getAnswerChoices();
+    submitCategorie = (event) => {
+        event.preventDefault();
+        const categorie = event.target.categorie.value;
+        this.createCategorie(categorie);
     }
 
     /**
@@ -246,52 +244,18 @@ class Vote extends Component {
         );
     }
 
-    submitHandle = (event) => {
-        event.preventDefault();
-        const choice = event.target.choice.value;
-        this.addAnswer(choice);
+    renderCategorie(categorie, index){
+        return(
+            <button key={index} className={"m-3 btn btn-outline-primary"}>
+                {categorie}
+            </button>
+        );
     }
 
-    renderChoices() {
-        return this.state.answerChoices.map((answerChoice, index) => {
-            return (
-                <div key={index} className={"ps-2 pe-2"}>
-                    <input className={"m-1"} value={index} type="radio" name="choice"/>
-                    {answerChoice}
-                </div>
-            );
+    renderCategories() {
+        return this.state.categories.map((categorie, index) => {
+            return this.renderCategorie(categorie, index);
         });
-    }
-
-    /**
-     * Rendu des réponses possible
-     * @returns {unknown[]}
-     */
-    renderAnswerChoices() {
-        if (this.state.answerChoices && this.state.answerChoices.length > 0) {
-            return (
-                <form onSubmit={this.submitHandle}>
-
-                    <div className={"d-flex justify-content-center"}>
-                        {this.renderChoices()}
-                    </div>
-                    <button className={"btn btn-primary"} type={"submit"}>Send</button>
-                </form>
-            );
-        }
-    }
-
-    renderTransactionHash() {
-        if (this.state.transactionHash) {
-            return (
-                <div>
-                    <h2>Transaction</h2>
-                    <a href={`https://kovan.etherscan.io/tx/${this.state.transactionHash}`} target={"_blank"}>
-                        {StringUtils.addressMinimise(this.state.transactionHash)}
-                    </a>
-                </div>
-            )
-        }
     }
 
     /**
@@ -305,18 +269,17 @@ class Vote extends Component {
                     <div className={"col"}>
                         {this.renderWeb3Connection()}
                     </div>
-                    <div className={"col"}>
-                        <div className={"row"}>
-                            <div className={"col"}>
-                                <h2>Question</h2>
-                                {this.state.question}
-                                {this.renderAnswerChoices()}
-                            </div>
-                            <div className={"col"}>
-                                {this.renderTransactionHash()}
-                            </div>
-                        </div>
+
+                    <div className={"d-flex justify-content-center"}>
+                        {this.renderCategories()}
                     </div>
+
+
+                    <form onSubmit={this.submitCategorie}>
+                        <input name={"categorie"}/>
+                        <input type={"submit"}/>
+                    </form>
+
                 </div>
             </div>
         );
