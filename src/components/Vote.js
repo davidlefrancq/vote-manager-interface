@@ -1,9 +1,16 @@
 import React, {Component} from 'react';
 import Web3 from "web3";
 import jsonInterface from "./jsonInterface.json";
-import StringUtils from "../utils/StringUtils";
+import Questionnaire from "./render-components/Questionnaire";
+import Question from "./render-components/Question";
+import Categorie from "./render-components/Categorie";
+import Categories from "./render-components/Categories";
+import Voter from "./render-components/Voter";
+import Web3Connexion from "./render-components/Web3Connexion";
+import QuestionnaireBo from "../bo/QuestionnaireBo";
+import QuestionBo from "../bo/QuestionBo";
 
-const addressContract = "0x2AEf0329f6d9ce5d4a8fBb94280056B1A169a574";
+const addressContract = "0x36d812d504a74b4caf5ec80b9c9a753417a42164";
 
 class Vote extends Component {
 
@@ -25,22 +32,145 @@ class Vote extends Component {
         super(props);
 
         this.state = {
-            isConnected: {
-                web3: false,
-                web3Account: null,
-            },
+            isConnected: false,
+            web3Account: null,
 
-            countCategorie: 0,
             categories: [],
+            questionnaires: [],
+            questions: [],
         };
+    }
 
+    componentDidMount() {
         this.ethereum = window.ethereum;
     }
 
-    setStateCountCategorie = (count) => {
+    loadContract = () => {
+
+        const web3 = new Web3(Web3.givenProvider);
+        this.contract = new web3.eth.Contract(
+            jsonInterface,
+            addressContract
+        );
+
+        if (this.contract) {
+            this.loadCategories();
+        }
+    }
+
+    loadCategories = () => {
+        if (this.contract) {
+
+            // Si Web3 est connecté
+            const {accounts} = this.state;
+            if (accounts.length > 0) {
+
+                // Exécution d'une requete sur le Contract Solidity
+                this.contract.methods.getCountCategorie().call({from: accounts[0]}).then((count) => {
+
+                    this.loadCategoriesData(count);
+
+                }).catch((error) => {
+                    console.error(error);
+                })
+            }
+        }
+    }
+
+    loadCategoriesData = (count) => {
+
+        this.resetCategoriesInState();
+
+        for (let i = 0; i < count; i++) {
+            this.loadCategoryData(i);
+        }
+    }
+
+    loadCategoryData = (index) => {
+
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
+
+            this.contract.methods.getCategorieData(index).call({from: accounts[0]}).then((data) => {
+
+                const {index, name} = data;
+                this.addCategorieInState(index, name);
+
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }
+
+    addCategorieInState = (index, name) => {
         const state = {...this.state};
-        state.countCategorie = count;
+        state.categories[index] = name;
         this.setState(state);
+    }
+
+    resetCategoriesInState = () => {
+        const state = {...this.state};
+        state.categories = [];
+        this.setState(state);
+    }
+
+    loadQuestionnaires = async (categorie) => {
+        const questionnaires = [];
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            const count = await this.contract.methods.getCountQuestionnaire(categorie).call({from: accounts[0]})
+
+            for (let i = 0; i < count; i++) {
+                const questionnaire = await this.loadQuestionnaire(categorie, i);
+                questionnaires.push(questionnaire);
+            }
+        }
+        return questionnaires;
+    }
+
+    loadQuestionnaire = async (categorie, index) => {
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            const data = await this.contract.methods.getQuestionnaireData(categorie, index).call({from: accounts[0]})
+
+            // console.log("Questionnaire : ", data);
+            const questionnaire = new QuestionnaireBo(data["index"], data["indexCategorie"], data["name"], data["questions"]);
+            // console.log(questionnaire);
+            return questionnaire;
+        }
+    }
+
+    loadQuestions = async (categorie, questionnaire) => {
+        const questions = [];
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            const count = await this.contract.methods.getCountQuestions(categorie, questionnaire).call({from: accounts[0]})
+            console.log("getCountQuestions",count);
+            for (let i = 0; i < count; i++) {
+                const question = await this.loadQuestion(categorie, questionnaire, i);
+                questions.push(question);
+            }
+        }
+        return questions;
+    }
+
+    loadQuestion = async (categorie, questionnaire, index) => {
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            const data = await this.contract.methods.getQuestionData(categorie, questionnaire, index).call({from: accounts[0]})
+
+            console.log("Questionnaire : ", data);
+            const question = new QuestionBo(null,data["indexCategorie"], data["indexQuestionnaire"], data["titre"], data["question"], data["image"], data["reponses"]);
+            return question;
+        }
     }
 
     /**
@@ -48,33 +178,15 @@ class Vote extends Component {
      */
     initEthereumEvents = () => {
         this.ethereum.on('accountsChanged', (accounts) => {
-            console.log("accountsChanged accounts", accounts, this.ethereum.isConnected());
+            // console.log("accountsChanged accounts", accounts, this.ethereum.isConnected());
             if (this.ethereum.isConnected()) {
                 this.connectToWeb3();
             }
         });
         this.ethereum.on('disconnect', (accounts) => {
-            console.log("disconnect accounts", accounts);
+            // console.log("disconnect accounts", accounts);
             this.disconnectedWeb3();
         });
-    }
-
-    initContract = () => {
-
-        // Chargement du contract
-        const web3 = new Web3(Web3.givenProvider);
-        const myContract = new web3.eth.Contract(
-            jsonInterface,
-            addressContract
-        );
-
-        // Sauvegarde dans une variable local du composant React
-        this.contract = myContract;
-        this.initCategories();
-    }
-
-    initCategories = () => {
-        this.getCountCategorie();
     }
 
     /**
@@ -82,8 +194,8 @@ class Vote extends Component {
      */
     disconnectedWeb3 = () => {
         const state = {...this.state};
-        state.isConnected.web3 = false;
-        state.isConnected.web3Account = null;
+        state.isConnected = false;
+        state.accounts = [];
         this.setState(state);
     }
 
@@ -94,81 +206,26 @@ class Vote extends Component {
         this.ethereum.request({method: 'eth_requestAccounts'}).then((result) => {
 
             const state = {...this.state};
-            state.isConnected.web3 = true;
-            state.isConnected.web3Account = result;
+            state.isConnected = true;
+            state.accounts = result;
             this.setState(state);
 
             this.initEthereumEvents();
-            this.initContract();
+            this.loadContract();
 
         }).catch((error) => {
             console.error(error);
         });
     }
 
-    getCategorieData = (index) => {
-
-        // Si Web3 est connecté
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
-
-            // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.getCategorieData(index).call({from: web3Account[0]}).then((result) => {
-
-                console.log(result);
-                const {index, name} = result;
-                this.addCategorieInState(name);
-
-            }).catch((error) => {
-                console.error(error);
-            });
-        }
-    }
-
-    resetCategories = () => {
-        const state = {...this.state};
-        state.categories = [];
-        this.setState(state);
-    }
-
-    getCountCategorie = () => {
-
-        this.resetCategories();
-
-        // Si Web3 est connecté
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
-
-            // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.getCountCategorie().call({from: web3Account[0]}).then((result) => {
-
-                console.log(result);
-                this.setStateCountCategorie(result);
-
-                for (let i = 0; i < result; i++) {
-                    this.getCategorieData(i);
-                }
-
-            }).catch((error) => {
-                console.error(error);
-            });
-        }
-    }
-
-    addCategorieInState = (categorie) => {
-        const state = {...this.state};
-        state.categories.push(categorie);
-        this.setState(state);
-    }
-
     getCategorieIndexByName = (name) => {
 
         // Si Web3 est connecté
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.getCategorieIndexByName(name).call({from: web3Account[0]}).then((result) => {
+            this.contract.methods.getCategorieIndexByName(name).call({from: accounts[0]}).then((result) => {
 
                 console.log(result);
                 this.addCategorieInState(result);
@@ -178,19 +235,17 @@ class Vote extends Component {
             });
         }
     }
-
-
+    
     createCategorie = (name) => {
 
         // Si Web3 est connecté
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.createCategorie(name).send({from: web3Account[0]}).then((result) => {
+            this.contract.methods.createCategorie(name).send({from: accounts[0]}).then((result) => {
 
-                console.log(result);
-                this.initCategories();
+                this.loadCategories();
 
             }).catch((error) => {
                 console.error(error);
@@ -204,81 +259,155 @@ class Vote extends Component {
         this.createCategorie(categorie);
     }
 
-    /**
-     * Rendu lorsque Web3JS est connecté
-     * @returns {JSX.Element}
-     */
-    renderWeb3IsConnected() {
-        if (this.state.isConnected.web3) {
-            return (
-                <div>
-                    <h2>Account</h2>
-                    <div>{this.state.isConnected.web3Account}</div>
-                </div>
-            );
+
+    questionnaireSubmit = (event) => {
+        event.preventDefault();
+        const name = event.target.nameQuestonnaire.value;
+        const indexCat = event.target.indexCategorie.value;
+
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
+
+            // addQuestionnaire(uint _categorie, string memory _name)
+            // Exécution d'une requete sur le Contract Solidity
+            this.contract.methods.addQuestionnaire(indexCat, name).send({from: accounts[0]}).then((result) => {
+
+                console.log(result);
+
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+
+    }
+
+    voteSubmit = (event) => {
+        event.preventDefault();
+        const categorie = event.target.categorie.value;
+        const questionnaire = event.target.questionnaire.value;
+        const question = event.target.question.value;
+        const choice = event.target.choice.value;
+
+        const {web3Account} = this.state.isConnected;
+        if (web3Account.length > 0) {
+
+            //addVoteToQuestion(uint _categorie, uint _questionnaire, uint _question, uint _choice) public returns (bool)
+            // Exécution d'une requete sur le Contract Solidity
+            this.contract.methods.addVoteToQuestion(categorie, questionnaire, question, choice).send({from: web3Account[0]}).then((result) => {
+
+                console.log(result);
+
+            }).catch((error) => {
+                console.error(error);
+            });
         }
     }
 
-    /**
-     * Rendu du bouton de connexion Web3JS
-     * @returns {JSX.Element}
-     */
-    renderWeb3ConnectionButton() {
-        if (!this.state.isConnected.web3) {
-            return (
-                <button className={"btn btn-outline-primary"} onClick={this.connectToWeb3}>Connection Web3</button>
-            );
+
+    questionSubmit = (event) => {
+        event.preventDefault();
+        const categorie = event.target.categorie.value;
+        const questionnaire = event.target.questionnaire.value;
+        const titre = event.target.titre.value;
+        const question = event.target.question.value;
+        const image = event.target.image.value;
+        const reponses = ["yes", "no"];
+
+        const {web3Account} = this.state.isConnected;
+        if (web3Account.length > 0) {
+
+            // Exécution d'une requete sur le Contract Solidity
+            this.contract.methods.addQuestions(categorie, questionnaire, titre, question, image, reponses).send({from: web3Account[0]}).then((result) => {
+
+                console.log("addQuestion : ", result);
+
+            }).catch((error) => {
+                console.error(error);
+            });
         }
     }
 
-    /**
-     * Rendu les éléments d'interaction Web3JS (bouton, status de connexion)
-     * @returns {JSX.Element}
-     */
-    renderWeb3Connection() {
-        return (
-            <div>
-                {this.renderWeb3ConnectionButton()}
-                {this.renderWeb3IsConnected()}
-            </div>
-        );
+    categorieChange = async (event) => {
+        event.preventDefault();
+        const categorie = event.target.value;
+        const questionnaires = await this.loadQuestionnaires(categorie);
+        const state = {...this.state};
+        state.questionnaires = questionnaires;
+        this.setState(state);
     }
 
-    renderCategorie(categorie, index){
-        return(
-            <button key={index} className={"m-3 btn btn-outline-primary"}>
-                {categorie}
-            </button>
-        );
+    getQuestionnaireInState = (index) => {
+        let questionnaire = null;
+
+        for(const key in this.state.questionnaires){
+            const item = this.state.questionnaires[key];
+            if(item.index == index){
+                questionnaire = item;
+            }
+        }
+
+        return questionnaire;
     }
 
-    renderCategories() {
-        return this.state.categories.map((categorie, index) => {
-            return this.renderCategorie(categorie, index);
-        });
+    questionnaireChange = async (event) => {
+        event.preventDefault();
+        const questionnaire = this.getQuestionnaireInState(event.target.value);
+        const questions = await this.loadQuestions(questionnaire.indexCategorie, questionnaire.index);
+        console.log("questions",questions);
+        const state = {...this.state};
+        state.questions = questions;
+        this.setState(state);
     }
+
 
     /**
      * Fonction de rendu appelé par defaut pas React
      * @returns {JSX.Element}
      */
     render() {
+
+        console.log("categories : ", this.state.categories);
+
         return (
             <div className={"container"}>
                 <div className={"row"}>
-                    <div className={"col"}>
-                        {this.renderWeb3Connection()}
+                    <div className={"col-12"}>
+                        <Web3Connexion isConnected={this.state.isConnected} accounts={this.state.accounts}
+                                       connectToWeb3={this.connectToWeb3}/>
                     </div>
 
-                    <div className={"d-flex justify-content-center"}>
-                        {this.renderCategories()}
+                    <div className={"col-6"}>
+
+                        <Categorie submitCategorie={this.submitCategorie}/>
+
+                        <Categories categories={this.state.categories}/>
+
                     </div>
 
+                    <div className={"col-6"}>
 
-                    <form onSubmit={this.submitCategorie}>
-                        <input name={"categorie"}/>
-                        <input type={"submit"}/>
-                    </form>
+                        <Questionnaire
+                            questionnaireSubmit={this.questionnaireSubmit}
+                            categories={this.state.categories}
+                        />
+
+                        <Question
+                            questionSubmit={this.questionSubmit}
+                            categories={this.state.categories}
+                            categorieChange={this.categorieChange}
+                            questionnaires={this.state.questionnaires}
+                        />
+
+                        <Voter
+                            voteSubmit={this.voteSubmit}
+                            categories={this.state.categories}
+                            categorieChange={this.categorieChange}
+                            questionnaires={this.state.questionnaires}
+                            questionnaireChange={this.questionnaireChange}
+                            questions={this.state.questions}
+                        />
+
+                    </div>
 
                 </div>
             </div>
