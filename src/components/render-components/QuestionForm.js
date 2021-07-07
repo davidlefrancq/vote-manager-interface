@@ -2,11 +2,11 @@ import React from 'react';
 
 const QuestionForm = (props) => {
 
-    const {questions} = props;
+    const {questions, questionChange} = props;
 
     const renderQuestionnaireFormOption = (index, question) => {
         return (
-            <option key={index} value={question.index}>{question.question}</option>
+            <option key={index} value={index}>{question.question}</option>
         );
     }
 
@@ -19,7 +19,7 @@ const QuestionForm = (props) => {
     const renderQuestionnairesFormSelect = () => {
         if (questions.length > 0) {
             return (
-                <select className="form-select" name={"question"}>
+                <select className="form-select" name={"question"} onChange={questionChange}>
                     <option></option>
                     {renderQuestionnairesFormOptions()}
                 </select>

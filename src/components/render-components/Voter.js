@@ -2,10 +2,20 @@ import React from 'react';
 import CategorieForm from "./CategorieForm";
 import QuestionnaireForm from "./QuestionnaireForm";
 import QuestionForm from "./QuestionForm";
+import ResponsesForm from "./ResponsesForm";
 
 const Voter = (props) => {
 
-    const {voteSubmit, categories, categorieChange, questionnaires, questionnaireChange, questions} = props;
+    const {
+        voteSubmit,
+        categories,
+        categorieChange,
+        questionnaires,
+        questionnaireChange,
+        questions,
+        questionChange,
+        reponses
+    } = props;
 
     return (
         <div className={"container-fluid m-2"}>
@@ -27,21 +37,17 @@ const Voter = (props) => {
                     </div>
                 </div>
 
-                {/* !!! TODO !!! */}
-                <div className={"text-start text-success fw-bold"}>TODO : L'index de la question n'est pas fournit.</div>
                 <div className={"row p-0"}>
                     <label className={"col-4 form-label text-start"}>Question</label>
                     <div className={"col-8"}>
-                        <QuestionForm questions={questions}/>
+                        <QuestionForm questions={questions} questionChange={questionChange}/>
                     </div>
                 </div>
 
-                {/* !!! TODO !!! */}
-                <div className={"text-start text-success fw-bold"}>TODO : Liste de choix</div>
                 <div className={"row p-0"}>
                     <label className={"col-4 form-label text-start"}>Choice</label>
                     <div className={"col-8"}>
-                        <input className={"form-control"} type={"integer"} name={"choice"}/>
+                        <ResponsesForm reponses={reponses}/>
                     </div>
                 </div>
 

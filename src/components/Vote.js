@@ -38,6 +38,7 @@ class Vote extends Component {
             categories: [],
             questionnaires: [],
             questions: [],
+            reponses: [],
         };
     }
 
@@ -151,7 +152,7 @@ class Vote extends Component {
 
             // Exécution d'une requete sur le Contract Solidity
             const count = await this.contract.methods.getCountQuestions(categorie, questionnaire).call({from: accounts[0]})
-            console.log("getCountQuestions",count);
+            console.log("getCountQuestions", count);
             for (let i = 0; i < count; i++) {
                 const question = await this.loadQuestion(categorie, questionnaire, i);
                 questions.push(question);
@@ -168,7 +169,7 @@ class Vote extends Component {
             const data = await this.contract.methods.getQuestionData(categorie, questionnaire, index).call({from: accounts[0]})
 
             console.log("Questionnaire : ", data);
-            const question = new QuestionBo(null,data["indexCategorie"], data["indexQuestionnaire"], data["titre"], data["question"], data["image"], data["reponses"]);
+            const question = new QuestionBo(null, data["indexCategorie"], data["indexQuestionnaire"], data["titre"], data["question"], data["image"], data["reponses"]);
             return question;
         }
     }
@@ -235,7 +236,7 @@ class Vote extends Component {
             });
         }
     }
-    
+
     createCategorie = (name) => {
 
         // Si Web3 est connecté
@@ -339,9 +340,9 @@ class Vote extends Component {
     getQuestionnaireInState = (index) => {
         let questionnaire = null;
 
-        for(const key in this.state.questionnaires){
+        for (const key in this.state.questionnaires) {
             const item = this.state.questionnaires[key];
-            if(item.index == index){
+            if (item.index == index) {
                 questionnaire = item;
             }
         }
@@ -353,9 +354,19 @@ class Vote extends Component {
         event.preventDefault();
         const questionnaire = this.getQuestionnaireInState(event.target.value);
         const questions = await this.loadQuestions(questionnaire.indexCategorie, questionnaire.index);
-        console.log("questions",questions);
+        console.log("questions", questions);
         const state = {...this.state};
         state.questions = questions;
+        this.setState(state);
+    }
+
+    questionChange = (event) => {
+        event.preventDefault();
+        const index = event.target.value;
+        const question = this.state.questions[index];
+        console.log(question);
+        const state = {...this.state};
+        state.reponses = question.reponses;
         this.setState(state);
     }
 
@@ -405,6 +416,8 @@ class Vote extends Component {
                             questionnaires={this.state.questionnaires}
                             questionnaireChange={this.questionnaireChange}
                             questions={this.state.questions}
+                            questionChange={this.questionChange}
+                            reponses={this.state.reponses}
                         />
 
                     </div>
