@@ -24,6 +24,11 @@
   color: white;
 }
 
+.App-header h1 {
+  font-size: xxx-large;
+  margin-bottom: 20px;
+}
+
 .App-link {
   color: #61dafb;
 }

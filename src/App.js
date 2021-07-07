@@ -8,7 +8,7 @@ function App() {
 
             <header className="App-header">
                 <FaLaptopCode size={96}/>
-                <p>Crypto Vote</p>
+                <h1>Crypto Vote</h1>
             </header>
 
             <Vote/>
