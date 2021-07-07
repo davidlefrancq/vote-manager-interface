@@ -359,8 +359,11 @@ class Vote extends Component {
             <div className={"container"}>
                 <div className={"row"}>
                     <div className={"col-12"}>
-                        <Web3Connexion isConnected={this.state.isConnected} accounts={this.state.accounts}
-                                       connectToWeb3={this.connectToWeb3}/>
+                        <Web3Connexion
+                            isConnected={this.state.isConnected}
+                            accounts={this.state.accounts}
+                            connectToWeb3={this.connectToWeb3}
+                        />
                     </div>
 
                     <div className={"col-6"}>

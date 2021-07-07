@@ -18,7 +18,7 @@ const Web3Connexion = (props) => {
     const renderWeb3ConnectionButton = () => {
         if (!isConnected) {
             return (
-                <button className={"btn btn-outline-primary"} onClick={connectToWeb3}>Connection Web3</button>
+                <button className={"btn btn-outline-primary m-3"} onClick={connectToWeb3}>Connection Web3</button>
             );
         }
     }
