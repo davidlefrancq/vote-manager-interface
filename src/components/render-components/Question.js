@@ -17,7 +17,7 @@ class Question extends Component {
         event.preventDefault();
         const {choice} = this.state;
 
-        if (choice && choice != "") {
+        if (choice && choice !== "") {
 
             const state = {...this.state};
             state.choices.push(choice);

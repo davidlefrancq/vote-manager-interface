@@ -318,7 +318,7 @@ class Vote extends Component {
 
         for (const key in this.state.questionnaires) {
             const item = this.state.questionnaires[key];
-            if (item.index == index) {
+            if (item.index === index) {
                 questionnaire = item;
             }
         }
