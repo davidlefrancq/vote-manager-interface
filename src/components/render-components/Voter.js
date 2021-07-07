@@ -14,7 +14,8 @@ const Voter = (props) => {
         questionnaireChange,
         questions,
         questionChange,
-        reponses
+        reponses,
+        isConnected
     } = props;
 
     return (
@@ -53,9 +54,10 @@ const Voter = (props) => {
 
                 <div className={"row p-0"}>
                     <div className={"text-end mt-2"}>
-                        <input className={"btn btn-primary"} type={"submit"}/>
+                        <input className={"btn btn-primary"} type={"submit"} disabled={isConnected ? "" : "disabled"}/>
                     </div>
                 </div>
+
             </form>
         </div>
     );

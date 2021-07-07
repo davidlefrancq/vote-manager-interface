@@ -3,7 +3,7 @@ import CategorieForm from "./CategorieForm";
 
 const Questionnaire = (props) => {
 
-    const {questionnaireSubmit, categories} = props;
+    const {questionnaireSubmit, categories, isConnected} = props;
 
     return (
         <div className={"container-fluid m-2"}>
@@ -29,7 +29,7 @@ const Questionnaire = (props) => {
                 </div>
 
                 <div className={"text-end mt-2"}>
-                    <input className={"btn btn-primary"} type={"submit"}/>
+                    <input className={"btn btn-primary"} type={"submit"} disabled={isConnected ? "" : "disabled"}/>
                 </div>
             </form>
 

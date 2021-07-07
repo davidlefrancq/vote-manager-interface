@@ -19,14 +19,14 @@ const CategorieForm = (props) => {
     const renderCategoriesFormSelect = () => {
         if (categories.length > 0) {
             return (
-                <select className="form-select" name={"indexCategorie"} onChange={categorieChange}>
+                <select className="form-select" name={"categorie"} onChange={categorieChange}>
                     <option></option>
                     {renderCategoriesFormOptions()}
                 </select>
             );
         } else {
             return (
-                <select className="form-select disabled" name={"indexCategorie"} disabled>
+                <select className="form-select disabled" name={"categorie"} disabled>
                     <option></option>
                 </select>
             );

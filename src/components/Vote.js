@@ -33,7 +33,7 @@ class Vote extends Component {
 
         this.state = {
             isConnected: false,
-            web3Account: null,
+            accounts: null,
 
             categories: [],
             questionnaires: [],
@@ -289,38 +289,14 @@ class Vote extends Component {
         const question = event.target.question.value;
         const choice = event.target.choice.value;
 
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
+        const {accounts} = this.state;
+        if (accounts.length > 0) {
 
             //addVoteToQuestion(uint _categorie, uint _questionnaire, uint _question, uint _choice) public returns (bool)
             // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.addVoteToQuestion(categorie, questionnaire, question, choice).send({from: web3Account[0]}).then((result) => {
+            this.contract.methods.addVoteToQuestion(categorie, questionnaire, question, choice).send({from: accounts[0]}).then((result) => {
 
                 console.log(result);
-
-            }).catch((error) => {
-                console.error(error);
-            });
-        }
-    }
-
-
-    questionSubmit = (event) => {
-        event.preventDefault();
-        const categorie = event.target.categorie.value;
-        const questionnaire = event.target.questionnaire.value;
-        const titre = event.target.titre.value;
-        const question = event.target.question.value;
-        const image = event.target.image.value;
-        const reponses = ["yes", "no"];
-
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
-
-            // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.addQuestions(categorie, questionnaire, titre, question, image, reponses).send({from: web3Account[0]}).then((result) => {
-
-                console.log("addQuestion : ", result);
 
             }).catch((error) => {
                 console.error(error);
@@ -389,7 +365,10 @@ class Vote extends Component {
 
                     <div className={"col-6"}>
 
-                        <Categorie submitCategorie={this.submitCategorie}/>
+                        <Categorie
+                            submitCategorie={this.submitCategorie}
+                            isConnected={this.state.isConnected}
+                        />
 
                         <Categories categories={this.state.categories}/>
 
@@ -400,6 +379,7 @@ class Vote extends Component {
                         <Questionnaire
                             questionnaireSubmit={this.questionnaireSubmit}
                             categories={this.state.categories}
+                            isConnected={this.state.isConnected}
                         />
 
                         <Question
@@ -407,6 +387,7 @@ class Vote extends Component {
                             categories={this.state.categories}
                             categorieChange={this.categorieChange}
                             questionnaires={this.state.questionnaires}
+                            isConnected={this.state.isConnected}
                         />
 
                         <Voter
@@ -418,6 +399,7 @@ class Vote extends Component {
                             questions={this.state.questions}
                             questionChange={this.questionChange}
                             reponses={this.state.reponses}
+                            isConnected={this.state.isConnected}
                         />
 
                     </div>

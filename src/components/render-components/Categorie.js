@@ -2,7 +2,7 @@ import React from 'react';
 
 const Categorie = (props) => {
 
-    const {submitCategorie} = props;
+    const {submitCategorie, isConnected} = props;
 
     return (
         <div className={"container-fluid m-2"}>
@@ -12,7 +12,7 @@ const Categorie = (props) => {
                 <input className={"form-control"} name={"categorie"}/>
 
                 <div className={"text-end mt-2"}>
-                    <input className={"btn btn-primary"} type={"submit"}/>
+                    <input className={"btn btn-primary"} type={"submit"} disabled={isConnected ? "" : "disabled"}/>
                 </div>
             </form>
         </div>
