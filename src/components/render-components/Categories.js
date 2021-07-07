@@ -6,7 +6,7 @@ const Categories = (props) => {
 
     const renderCategorie = (categorie, index) => {
         return (
-            <button key={index} className={"m-3 btn btn-outline-primary"}>
+            <button key={index} className={"m-3 btn btn-outline-primary"} disabled>
                 {categorie}
             </button>
         );
