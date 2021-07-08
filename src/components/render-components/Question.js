@@ -49,7 +49,9 @@ class Question extends Component {
         const image = event.target.image.value;
         const reponses = this.state.choices;
 
-        const {accounts} = this.state;
+
+        const {accounts} = this.props;
+        console.log(accounts);
         if (accounts && accounts.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity

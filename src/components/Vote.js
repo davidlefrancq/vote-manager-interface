@@ -391,6 +391,8 @@ class Vote extends Component {
                             categorieChange={this.categorieChange}
                             questionnaires={this.state.questionnaires}
                             isConnected={this.state.isConnected}
+                            accounts={this.state.accounts}
+                            contract={this.contract}
                         />
 
                         <Voter
