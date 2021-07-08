@@ -1,4 +1,5 @@
 import React from 'react';
+import {BiLogInCircle} from "react-icons/all";
 
 const Web3Connexion = (props) => {
 
@@ -7,9 +8,8 @@ const Web3Connexion = (props) => {
     const renderWeb3IsConnected = () => {
         if (isConnected) {
             return (
-                <div>
-                    <h2>Account</h2>
-                    <div>{accounts[0]}</div>
+                <div style={{fontSize:18}}>
+                    {accounts[0]}
                 </div>
             );
         }
@@ -18,7 +18,9 @@ const Web3Connexion = (props) => {
     const renderWeb3ConnectionButton = () => {
         if (!isConnected) {
             return (
-                <button className={"btn btn-outline-primary m-3"} onClick={connectToWeb3}>Connection Web3</button>
+                <button className={"btn btn-link"} onClick={connectToWeb3}>
+                    <BiLogInCircle size={32}/>
+                </button>
             );
         }
     }

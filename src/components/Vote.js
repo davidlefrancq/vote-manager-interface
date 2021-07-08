@@ -9,6 +9,7 @@ import Voter from "./render-components/Voter";
 import Web3Connexion from "./render-components/Web3Connexion";
 import QuestionnaireBo from "../bo/QuestionnaireBo";
 import QuestionBo from "../bo/QuestionBo";
+import {BsFillArchiveFill, FaLaptopCode, GiJigsawBox, IoIosArchive, RiTeamFill} from "react-icons/all";
 
 const addressContract = "0x36d812d504a74b4caf5ec80b9c9a753417a42164";
 
@@ -356,9 +357,14 @@ class Vote extends Component {
         console.log("categories : ", this.state.categories);
 
         return (
-            <div className={"container"}>
-                <div className={"row"}>
-                    <div className={"col-12"}>
+            <>
+
+                <header className="App-header" style={{position:"relative"}}>
+                    <GiJigsawBox size={64}/>
+                    <h1>Crypto Vote</h1>
+                    <p>Admin</p>
+
+                    <div style={{position:"absolute", top:5, right:5}}>
                         <Web3Connexion
                             isConnected={this.state.isConnected}
                             accounts={this.state.accounts}
@@ -366,51 +372,57 @@ class Vote extends Component {
                         />
                     </div>
 
-                    <div className={"col-6"}>
+                </header>
 
-                        <Categorie
-                            submitCategorie={this.submitCategorie}
-                            isConnected={this.state.isConnected}
-                        />
+                <div className={"container"}>
+                    <div className={"row"}>
 
-                        <Categories categories={this.state.categories}/>
+                        <div className={"col-6"}>
+
+                            <Categorie
+                                submitCategorie={this.submitCategorie}
+                                isConnected={this.state.isConnected}
+                            />
+
+                            <Categories categories={this.state.categories}/>
+
+                        </div>
+
+                        <div className={"col-6"}>
+
+                            <Questionnaire
+                                questionnaireSubmit={this.questionnaireSubmit}
+                                categories={this.state.categories}
+                                isConnected={this.state.isConnected}
+                            />
+
+                            <Question
+                                questionSubmit={this.questionSubmit}
+                                categories={this.state.categories}
+                                categorieChange={this.categorieChange}
+                                questionnaires={this.state.questionnaires}
+                                isConnected={this.state.isConnected}
+                                accounts={this.state.accounts}
+                                contract={this.contract}
+                            />
+
+                            <Voter
+                                voteSubmit={this.voteSubmit}
+                                categories={this.state.categories}
+                                categorieChange={this.categorieChange}
+                                questionnaires={this.state.questionnaires}
+                                questionnaireChange={this.questionnaireChange}
+                                questions={this.state.questions}
+                                questionChange={this.questionChange}
+                                reponses={this.state.reponses}
+                                isConnected={this.state.isConnected}
+                            />
+
+                        </div>
 
                     </div>
-
-                    <div className={"col-6"}>
-
-                        <Questionnaire
-                            questionnaireSubmit={this.questionnaireSubmit}
-                            categories={this.state.categories}
-                            isConnected={this.state.isConnected}
-                        />
-
-                        <Question
-                            questionSubmit={this.questionSubmit}
-                            categories={this.state.categories}
-                            categorieChange={this.categorieChange}
-                            questionnaires={this.state.questionnaires}
-                            isConnected={this.state.isConnected}
-                            accounts={this.state.accounts}
-                            contract={this.contract}
-                        />
-
-                        <Voter
-                            voteSubmit={this.voteSubmit}
-                            categories={this.state.categories}
-                            categorieChange={this.categorieChange}
-                            questionnaires={this.state.questionnaires}
-                            questionnaireChange={this.questionnaireChange}
-                            questions={this.state.questions}
-                            questionChange={this.questionChange}
-                            reponses={this.state.reponses}
-                            isConnected={this.state.isConnected}
-                        />
-
-                    </div>
-
                 </div>
-            </div>
+            </>
         );
     }
 

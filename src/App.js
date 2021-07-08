@@ -6,11 +6,6 @@ function App() {
     return (
         <div className="App">
 
-            <header className="App-header">
-                <FaLaptopCode size={96}/>
-                <h1>Crypto Vote Admin</h1>
-            </header>
-
             <Vote/>
 
         </div>
