@@ -50,7 +50,7 @@ class Question extends Component {
         const reponses = this.state.choices;
 
         const {accounts} = this.state;
-        if (accounts.length > 0) {
+        if (accounts && accounts.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity
             this.props.contract.methods.addQuestions(categorie, questionnaire, titre, question, image, reponses).send({from: accounts[0]}).then((result) => {
