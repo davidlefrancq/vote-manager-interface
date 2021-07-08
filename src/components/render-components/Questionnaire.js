@@ -16,7 +16,7 @@ const Questionnaire = (props) => {
 
     return (
         <div className={"container-fluid m-2"}>
-            <h2 className={"text-start border-top"}>Questionnaire</h2>
+            <h2 className={"text-start"}>Questionnaire</h2>
 
             <form onSubmit={sumbitHandle}>
                 <div className={"row"}>

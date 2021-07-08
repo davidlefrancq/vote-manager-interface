@@ -6,7 +6,7 @@ const Categorie = (props) => {
 
     return (
         <div className={"container-fluid m-2"}>
-            <h2 className={"text-start border-top"}>Catégorie</h2>
+            <h2 className={"text-start"}>Catégorie</h2>
 
             <form onSubmit={submitCategorie}>
                 <input className={"form-control"} name={"categorie"}/>
