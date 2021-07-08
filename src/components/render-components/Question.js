@@ -40,9 +40,15 @@ class Question extends Component {
         this.setState(state);
     }
 
+    resetChoice = () => {
+        const state = {...this.state};
+        state.choices = [];
+        this.setState(state);
+    }
+
     questionSubmit = (event) => {
         event.preventDefault();
-        const categorie = event.target.categorie.value;
+        const categorie = event.target.indexCategorie.value;
         const questionnaire = event.target.questionnaire.value;
         const titre = event.target.titre.value;
         const question = event.target.question.value;
@@ -51,13 +57,13 @@ class Question extends Component {
 
 
         const {accounts} = this.props;
-        console.log(accounts);
         if (accounts && accounts.length > 0) {
 
             // Exécution d'une requete sur le Contract Solidity
             this.props.contract.methods.addQuestions(categorie, questionnaire, titre, question, image, reponses).send({from: accounts[0]}).then((result) => {
 
-                console.log("addQuestion : ", result);
+                event.target.reset();
+                this.resetChoice();
 
             }).catch((error) => {
                 console.error(error);

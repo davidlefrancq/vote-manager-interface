@@ -5,11 +5,11 @@ import Questionnaire from "./render-components/Questionnaire";
 import Question from "./render-components/Question";
 import Categorie from "./render-components/Categorie";
 import Categories from "./render-components/Categories";
-import Voter from "./render-components/Voter";
+// import Voter from "./render-components/Voter";
 import Web3Connexion from "./render-components/Web3Connexion";
 import QuestionnaireBo from "../bo/QuestionnaireBo";
 import QuestionBo from "../bo/QuestionBo";
-import {BsFillArchiveFill, FaLaptopCode, GiJigsawBox, IoIosArchive, RiTeamFill} from "react-icons/all";
+import {GiJigsawBox} from "react-icons/all";
 
 const addressContract = "0x36d812d504a74b4caf5ec80b9c9a753417a42164";
 
@@ -263,24 +263,28 @@ class Vote extends Component {
 
 
     questionnaireSubmit = (event) => {
-        event.preventDefault();
-        const name = event.target.nameQuestonnaire.value;
-        const indexCat = event.target.indexCategorie.value;
+        return new Promise((resolve, reject) => {
 
-        const {accounts} = this.state;
-        if (accounts.length > 0) {
+            const name = event.target.nameQuestonnaire.value;
+            const indexCat = event.target.indexCategorie.value;
 
-            // addQuestionnaire(uint _categorie, string memory _name)
-            // Exécution d'une requete sur le Contract Solidity
-            this.contract.methods.addQuestionnaire(indexCat, name).send({from: accounts[0]}).then((result) => {
+            const {accounts} = this.state;
+            if (accounts.length > 0) {
 
-                console.log(result);
+                // addQuestionnaire(uint _categorie, string memory _name)
+                // Exécution d'une requete sur le Contract Solidity
+                this.contract.methods.addQuestionnaire(indexCat, name).send({from: accounts[0]}).then((data) => {
 
-            }).catch((error) => {
-                console.error(error);
-            });
-        }
+                    resolve(data);
 
+                }).catch((error) => {
+                    reject(error);
+                });
+            } else {
+                reject(new Error("You are not connected."))
+            }
+
+        });
     }
 
     voteSubmit = (event) => {
@@ -305,13 +309,32 @@ class Vote extends Component {
         }
     }
 
-    categorieChange = async (event) => {
+    resetQuestionnaires = () => {
+        return new Promise((resolve, reject) => {
+            try {
+                const state = {...this.state};
+                state.questionnaires = [];
+                this.setState(state);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    categorieChange = (event) => {
         event.preventDefault();
         const categorie = event.target.value;
-        const questionnaires = await this.loadQuestionnaires(categorie);
-        const state = {...this.state};
-        state.questionnaires = questionnaires;
-        this.setState(state);
+        this.resetQuestionnaires().then(async () => {
+
+            const questionnaires = await this.loadQuestionnaires(categorie);
+            const state = {...this.state};
+            state.questionnaires = questionnaires;
+            this.setState(state);
+
+        }).catch((error)=>{
+            console.error(error);
+        });
     }
 
     getQuestionnaireInState = (index) => {
@@ -359,12 +382,12 @@ class Vote extends Component {
         return (
             <>
 
-                <header className="App-header" style={{position:"relative"}}>
+                <header className="App-header" style={{position: "relative"}}>
                     <GiJigsawBox size={64}/>
                     <h1>Crypto Vote</h1>
                     <p>Admin</p>
 
-                    <div style={{position:"absolute", top:5, right:5}}>
+                    <div style={{position: "absolute", top: 5, right: 5}}>
                         <Web3Connexion
                             isConnected={this.state.isConnected}
                             accounts={this.state.accounts}
@@ -406,17 +429,17 @@ class Vote extends Component {
                                 contract={this.contract}
                             />
 
-                            <Voter
-                                voteSubmit={this.voteSubmit}
-                                categories={this.state.categories}
-                                categorieChange={this.categorieChange}
-                                questionnaires={this.state.questionnaires}
-                                questionnaireChange={this.questionnaireChange}
-                                questions={this.state.questions}
-                                questionChange={this.questionChange}
-                                reponses={this.state.reponses}
-                                isConnected={this.state.isConnected}
-                            />
+                            {/*<Voter*/}
+                            {/*    voteSubmit={this.voteSubmit}*/}
+                            {/*    categories={this.state.categories}*/}
+                            {/*    categorieChange={this.categorieChange}*/}
+                            {/*    questionnaires={this.state.questionnaires}*/}
+                            {/*    questionnaireChange={this.questionnaireChange}*/}
+                            {/*    questions={this.state.questions}*/}
+                            {/*    questionChange={this.questionChange}*/}
+                            {/*    reponses={this.state.reponses}*/}
+                            {/*    isConnected={this.state.isConnected}*/}
+                            {/*/>*/}
 
                         </div>
 

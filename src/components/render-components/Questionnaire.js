@@ -5,17 +5,21 @@ const Questionnaire = (props) => {
 
     const {questionnaireSubmit, categories, isConnected} = props;
 
+    const sumbitHandle = (event) => {
+        event.preventDefault();
+        questionnaireSubmit(event).then(()=>{
+            event.target.reset();
+        }).catch(()=>{
+
+        });
+    }
+
     return (
         <div className={"container-fluid m-2"}>
             <h2 className={"text-start border-top"}>Questionnaire</h2>
 
-            <form onSubmit={questionnaireSubmit}>
+            <form onSubmit={sumbitHandle}>
                 <div className={"row"}>
-
-                    <label className={"col-4 form-label text-start"}>Nom du questionnaire</label>
-                    <div className={"col-8"}>
-                        <input className={"form-control"} name={"nameQuestonnaire"}/>
-                    </div>
 
                     <div className={"row p-0"}>
                         <label className={"col-4 form-label ps-4 text-start"}>Catégorie</label>
@@ -24,6 +28,11 @@ const Questionnaire = (props) => {
                             <CategorieForm categories={categories}/>
 
                         </div>
+                    </div>
+
+                    <label className={"col-4 form-label text-start"}>Nom du questionnaire</label>
+                    <div className={"col-8"}>
+                        <input className={"form-control"} name={"nameQuestonnaire"}/>
                     </div>
 
                 </div>
