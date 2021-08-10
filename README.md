@@ -50,6 +50,7 @@ In learning process to develop application on the blockchain, our team has write
 
 ### Prototype / Proof of concept
 Developed by "Integration Team Web3js" for proof of concept.
+- Cypto Vote Prototype [Netlify Link](https://crypto-vote-prototype.netlify.app/)
 - Vote React Solidity [Github Link](https://github.com/davidlefrancq/vote-react-solidity)
 
 
