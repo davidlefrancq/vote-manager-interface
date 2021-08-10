@@ -1,4 +1,4 @@
-# Vote React
+# Vote React / Solidity
 
 ### FR
 Cette application a été développé pour Kovan. Kovan est une blockchain dédié aux tests et aux développeur d'application Ethereum.
