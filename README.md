@@ -10,7 +10,7 @@ This app was developed for Kovan. Kovan is a blockchain dedicated to testing and
 ## Work Team
 
 - [Olivier Fernandez](https://github.com/fernandezOli) for Solidity Contract Multi Vote
-- [Anis Boussedra](https://github.com/juniorji) for React User Interface
+- [JI](https://github.com/juniorji) for React User Interface
 - [David Lefrancq](https://github.com/davidlefrancq) for Vote Manager Interface and Integration Team Web3js
 - René Uzio in Integration Team Web3js
 
